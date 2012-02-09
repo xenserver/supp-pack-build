@@ -1,0 +1,36 @@
+%{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
+
+Summary: Create XCP supplemental packs
+Name: supp-pack-build
+Version: @SUPP_PACK_BUILD_VERSION@
+Release: @SUPP_PACK_BUILD_RELEASE@
+Source: %{name}-%{version}.tar.gz
+License: GPL
+Group: Applications/System
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
+BuildArch: noarch
+ 
+BuildRequires: python-devel python-setuptools
+
+%description
+Tools to create supplemental packs for XCP.
+
+%prep
+%setup -q
+
+%build
+%{__python} setup.py build
+ 
+%install
+rm -rf $RPM_BUILD_ROOT
+%{__python} setup.py install -O1 --skip-build --root %{buildroot}
+ 
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root)
+%{python_sitelib}
+%attr(0755,-,-) /usr/bin/*
+
+%changelog
