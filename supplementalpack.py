@@ -30,9 +30,6 @@ import tarfile
 import tempfile
 import xml.dom.minidom
 
-# allow creation of bzipped tar packages
-permit_legacy = False
-
 def md5sum_file(fname):
         digest = md5.new()
         fh = open(fname)
@@ -45,6 +42,9 @@ def md5sum_file(fname):
         return digest.hexdigest()
 
 class Package:
+    # allow creation of bzipped tar packages
+    permit_legacy = False
+
     def __init__(self, fname):
         self.fname = fname
         try:
@@ -80,7 +80,7 @@ class Package:
 
     # validate a package
     def check(self):
-        if self.type == 'unknown' or (self.type == 'tbz2' and not permit_legacy):
+        if self.type == 'unknown' or (self.type == 'tbz2' and not self.permit_legacy):
             raise SystemExit, "Error: unsupported package type " + self.fname
 
         if self.type == 'rpm':
@@ -249,6 +249,8 @@ def setup(**attrs):
 
     if attrs['reorder']:
         pkgs = _order_pkgs(pkgs)
+    if 'permit_legacy' in attrs and attrs['permit_legacy']:
+	Package.permit_legacy = True
     
     # Check packages
     for pkg in pkgs:
