@@ -340,7 +340,7 @@ def setup(**attrs):
                     os.path.join(tmpdir, "install"))
 
     if 'tar' in attrs['output']:
-        tf = tarfile.TarFile(os.path.join(attrs['outdir'], attrs['name']+'.tar.gz'), 'w')
+        tf = tarfile.TarFile.open(os.path.join(attrs['outdir'], attrs['name']+'.tar.gz'), 'w:gz')
 
         for fname in os.listdir(tmpdir):
             s = os.stat(os.path.join(tmpdir, fname))
