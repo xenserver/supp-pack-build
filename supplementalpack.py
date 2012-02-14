@@ -247,7 +247,7 @@ def setup(**attrs):
 	if len(args) > 0:
 	    pkgs += map(lambda x: Package(x), args)
 
-    if attrs['reorder']:
+    if 'reorder' in attrs and attrs['reorder']:
         pkgs = _order_pkgs(pkgs)
     if 'permit_legacy' in attrs and attrs['permit_legacy']:
 	Package.permit_legacy = True
