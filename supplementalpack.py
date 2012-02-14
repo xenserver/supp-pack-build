@@ -310,7 +310,11 @@ def setup(**attrs):
     if True in map(lambda x: x in attrs['output'], ('iso', 'tar')):
         tmpdir = tempfile.mkdtemp(prefix = 'pack-')
         bindir = os.path.dirname(sys.argv[0])
-        if not os.path.exists(os.path.join(bindir, "suppack-install.py")):
+        if os.path.exists(os.path.join(bindir, "suppack-install.py")):
+            scriptdir = bindir
+	elif os.path.exists("/usr/bin/suppack-install.py"):
+	    scriptdir = "/usr/bin"
+	else:
             raise SystemExit, "Cannot locate suppack-install.py"
 
         fh = open(os.path.join(tmpdir, "XS-REPOSITORY"), 'w')
@@ -332,7 +336,7 @@ def setup(**attrs):
         os.chmod(os.path.join(tmpdir, "install.sh"),
                  stat.S_IRUSR|stat.S_IWUSR|stat.S_IXUSR|stat.S_IRGRP|stat.S_IROTH)
 
-        shutil.copy(os.path.join(bindir, "suppack-install.py"),
+        shutil.copy(os.path.join(scriptdir, "suppack-install.py"),
                     os.path.join(tmpdir, "install"))
 
     if 'tar' in attrs['output']:
