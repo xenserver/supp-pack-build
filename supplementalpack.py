@@ -306,6 +306,13 @@ def setup(**attrs):
         for pkg in pkgs:
             shutil.copy(pkg.fname, attrs['outdir'])
 
+    digest = md5.new()
+    digest.update(rtop.toprettyxml())
+    digest.update(ptop.toprettyxml())
+    fh = open(os.path.join(attrs['outdir'], attrs['name']+".metadata.md5"), 'w')
+    fh.write(digest.hexdigest() + '\n')
+    fh.close()
+
     tmpdir = None
     if True in map(lambda x: x in attrs['output'], ('iso', 'tar')):
         tmpdir = tempfile.mkdtemp(prefix = 'pack-')
@@ -357,10 +364,14 @@ def setup(**attrs):
         tf.close()
 
     if 'iso' in attrs['output']:
+	isofile = os.path.join(attrs['outdir'], attrs['name']+'.iso')
         subprocess.call(['mkisofs', '-f', '-A', attrs['vendor'], '-V',
                          attrs['description'], '-J', '-joliet-long',
-                         '-r', '-o', os.path.join(attrs['outdir'], attrs['name']+'.iso'),
-                         tmpdir])
+                         '-r', '-o', isofile, tmpdir])
+	digest = md5sum_file(isofile)
+	fh = open(isofile + '.md5', 'w')
+	fh.write("%s  %s\n" % (digest, os.path.basename(isofile)))
+	fh.close()
 
     if tmpdir:
         shutil.rmtree(tmpdir, True)
