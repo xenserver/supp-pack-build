@@ -197,6 +197,23 @@ def _order_pkgs(pkgs):
 
     return legacy_pkgs + map(lambda x: tlate[x], ordered)
 
+# reformat XML to previous layout
+def _compat_xml(el):
+    out = ''
+    strip_next = False
+    for line in el.toprettyxml(indent='  ').split('\n'):
+        l = line
+	if strip_next:
+	    l = line.strip()
+	strip_next = False
+	if '<' not in line:
+	    l = line.strip()
+	    strip_next = True
+	out += l
+	if not line.startswith(' ') or '</' in line or '/>' in line:
+	    out += '\n'
+    return out	
+
 def install_sh_text():
     return """#!/bin/sh
 exec ${0%.sh} $*
@@ -296,19 +313,19 @@ def setup(**attrs):
     # Create outputs
     if 'dir' in attrs['output']:
         fh = open(os.path.join(attrs['outdir'], "XS-REPOSITORY"), 'w')
-        fh.write(rtop.toprettyxml())
+	fh.write(_compat_xml(rtop))
         fh.close()
 
         fh = open(os.path.join(attrs['outdir'], "XS-PACKAGES"), 'w')
-        fh.write(ptop.toprettyxml())
+	fh.write(_compat_xml(ptop))
         fh.close()
 
         for pkg in pkgs:
             shutil.copy(pkg.fname, attrs['outdir'])
 
     digest = md5.new()
-    digest.update(rtop.toprettyxml())
-    digest.update(ptop.toprettyxml())
+    digest.update(_compat_xml(rtop))
+    digest.update(_compat_xml(ptop))
     fh = open(os.path.join(attrs['outdir'], attrs['name']+".metadata.md5"), 'w')
     fh.write(digest.hexdigest() + '\n')
     fh.close()
@@ -325,11 +342,11 @@ def setup(**attrs):
             raise SystemExit, "Cannot locate suppack-install.py"
 
         fh = open(os.path.join(tmpdir, "XS-REPOSITORY"), 'w')
-        fh.write(rtop.toprettyxml())
+	fh.write(_compat_xml(rtop))
         fh.close()
 
         fh = open(os.path.join(tmpdir, "XS-PACKAGES"), 'w')
-        fh.write(ptop.toprettyxml())
+	fh.write(_compat_xml(ptop))
         fh.close()
 
         for pkg in pkgs:
