@@ -33,4 +33,7 @@ rm -rf $RPM_BUILD_ROOT
 %{python_sitelib}
 %attr(0755,-,-) /usr/bin/*
 
+%post
+[ -r %python_sitelib/xcp/__init__.py ] || touch %python_sitelib/xcp/__init__.py
+
 %changelog
