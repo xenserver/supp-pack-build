@@ -75,6 +75,7 @@ class Package:
         elif re.search('bzip2', filetype):
             self.type = 'tbz2'
             self.label = os.path.basename(fname)
+	    self.root = '/'
         else:
             self.type = 'unknown'
 
@@ -122,6 +123,8 @@ class Package:
             pe.setAttribute(a, self.__dict__[a])
         if self.type == 'driver-rpm':
             pe.setAttribute('kernel', self.kernel)
+	elif self.type == 'tbz2':
+	    pe.setAttribute('root', self.root)
         pe.appendChild(doc.createTextNode(os.path.basename(self.fname)))
 
         return pe
