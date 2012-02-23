@@ -204,7 +204,7 @@ def _order_pkgs(pkgs):
 def _compat_xml(el):
     out = ''
     strip_next = False
-    for line in el.toprettyxml(indent='  ').split('\n'):
+    for line in el.toprettyxml(indent='  ').split('\n')[:-1]:
         l = line
 	if strip_next:
 	    l = line.strip()
