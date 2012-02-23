@@ -233,9 +233,9 @@ def setup(**attrs):
     if False in map(lambda x: x in attrs and attrs[x] != None, setup_args):
         raise SystemExit, "Error: missing mandatory argument"
 
-    if ' ' in attrs['originator']:
+    if True in map(lambda x: x in attrs['originator'], [' ', '#', '/']):
         raise SystemExit, "Error: invalid originator"
-    if ' ' in attrs['name']:
+    if True in map(lambda x: x in attrs['name'], [' ', '#', '/']):
         raise SystemExit, "Error: invalid name"
 
     if 'enforce_homogeneity' in attrs:
