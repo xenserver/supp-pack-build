@@ -273,6 +273,8 @@ def setup(**attrs):
 	Package.permit_legacy = True
     
     # Check packages
+    if len(pkgs) == 0:
+        raise SystemExit, "Error: no packages supplied"
     for pkg in pkgs:
         pkg.check()
     xen_pkgs = set(map(lambda y: y.label+':'+y.kernel.replace('xen', ''),
