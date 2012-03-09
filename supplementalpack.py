@@ -217,6 +217,13 @@ def _compat_xml(el):
 	    out += '\n'
     return out	
 
+def _valid_ident(ident):
+	vc = 'abcdefghijklmnopqrstuvwxyz'
+	vc += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+	vc += '0123456789'
+	vc += '-_.'
+	return len(ident.strip(vc)) == 0
+
 def install_sh_text():
     return """#!/bin/sh
 exec ${0%.sh} $*
@@ -233,9 +240,9 @@ def setup(**attrs):
     if False in map(lambda x: x in attrs and attrs[x] != None, setup_args):
         raise SystemExit, "Error: missing mandatory argument"
 
-    if True in map(lambda x: x in attrs['originator'], [' ', '#', '/']):
+    if not _valid_ident(attrs['originator']):
         raise SystemExit, "Error: invalid originator"
-    if True in map(lambda x: x in attrs['name'], [' ', '#', '/']):
+    if not _valid_ident(attrs['name']):
         raise SystemExit, "Error: invalid name"
 
     if 'enforce_homogeneity' in attrs:
