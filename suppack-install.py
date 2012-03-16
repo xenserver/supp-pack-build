@@ -126,6 +126,7 @@ if fatal:
 
 # filter RPMs currently installed
 install_list = []
+upgrade_list = []
 for p in filter(lambda x: isinstance(x, RPMPackage), repo.packages):
     pkg_name, _ = subprocess.Popen(['rpm', '--nosignature', '-q', '--qf', '%{NAME}',
                                     '-p', p.filename], stdout=subprocess.PIPE,
@@ -133,14 +134,21 @@ for p in filter(lambda x: isinstance(x, RPMPackage), repo.packages):
     pkg_ver, _ = subprocess.Popen(['rpm', '--nosignature', '-q', '--qf', '%{VERSION}-%{RELEASE}',
                                     '-p', p.filename], stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE).communicate()
+    install = True in map(pkg_name, ['kernel-xen', 'kernel-kdump'])
     s = subprocess.Popen(['rpm', '--nosignature', '-q', '--qf', '%{VERSION}-%{RELEASE}',
                           pkg_name], stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
     inst_ver, _ = s.communicate()
     if s.returncode != 0:
-        install_list.append(p)
+        if install:
+            install_list.append(p)
+        else:
+            upgrade_list.append(p)
     elif pkg_ver != inst_ver:
-        install_list.append(p)
+        if install:
+            install_list.append(p)
+        else:
+            upgrade_list.append(p)
 
 print "Installing '%s'...\n" % repo.description
 
@@ -156,7 +164,12 @@ for p in filter(lambda x: isinstance(x, RPMPackage), repo.packages):
 
 # install packages
 if len(install_list) > 0:
-    s = subprocess.Popen(['rpm', '-Uhv'] + map(lambda x: x.filename, install_list))
+    s = subprocess.Popen(['rpm', '-ihv'] + map(lambda x: x.filename, install_list))
+    _ = s.communicate()
+    if s.returncode != 0:
+        raise SystemExit, "FATAL: packages failed to install"
+if len(upgrade_list) > 0:
+    s = subprocess.Popen(['rpm', '-Uhv'] + map(lambda x: x.filename, upgrade_list))
     _ = s.communicate()
     if s.returncode != 0:
         raise SystemExit, "FATAL: packages failed to install"
