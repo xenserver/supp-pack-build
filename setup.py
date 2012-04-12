@@ -17,5 +17,5 @@ setup(name='build-supplemental-pack',
       description='build XCP supplemental packs',
       packages=['xcp'],
       scripts=['scripts/build-supplemental-pack.py', 'scripts/suppack-install.py',
-               'scripts/build-supplemental-pack.sh'],
+               'scripts/build-supplemental-pack.sh', 'scripts/suppack-install.sh'],
      )

@@ -224,11 +224,6 @@ def _valid_ident(ident):
 	vc += '-_.'
 	return len(ident.strip(vc)) == 0
 
-def install_sh_text():
-    return """#!/bin/sh
-exec ${0%.sh} $*
-"""
-
 setup_attrs = ('originator', 'name', 'product', 'version')
 opt_attrs = ('build', 'memory_requirement_mb', 'enforce_homogeneity')
 setup_args = ('vendor', 'description')
@@ -366,12 +361,8 @@ def setup(**attrs):
                        os.path.join(tmpdir, os.path.basename(pkg.fname)))
 
         # Copy install scripts
-        fh = open(os.path.join(tmpdir, "install.sh"), 'w')
-        fh.write(install_sh_text())
-        fh.close()
-        os.chmod(os.path.join(tmpdir, "install.sh"),
-                 stat.S_IRUSR|stat.S_IWUSR|stat.S_IXUSR|stat.S_IRGRP|stat.S_IROTH)
-
+        shutil.copy(os.path.join(scriptdir, "suppack-install.sh"),
+                    os.path.join(tmpdir, "install.sh"))
         shutil.copy(os.path.join(scriptdir, "suppack-install.py"),
                     os.path.join(tmpdir, "install"))
 

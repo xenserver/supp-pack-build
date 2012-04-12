@@ -54,6 +54,7 @@ $(SUPP_PACK_BUILD_SRC): $(SUPP_PACK_BUILD_SOURCES)
 	cp -f supplementalpack.py $(MY_OBJ_DIR)/$(SUPP_PACK_BUILD_SRC_DIR)/$(DIRNAME)
 	cp -f build-supplemental-pack.py $(MY_OBJ_DIR)/$(SUPP_PACK_BUILD_SRC_DIR)/scripts
 	cp -f suppack-install.py $(MY_OBJ_DIR)/$(SUPP_PACK_BUILD_SRC_DIR)/scripts
+	cp -f suppack-install.sh $(MY_OBJ_DIR)/$(SUPP_PACK_BUILD_SRC_DIR)/scripts
 	echo -e "#!/bin/sh\nexec \$${0%.sh}.py \$$*" >$(MY_OBJ_DIR)/$(SUPP_PACK_BUILD_SRC_DIR)/scripts/build-supplemental-pack.sh
 	tar zcf $@ -C $(MY_OBJ_DIR) $(SUPP_PACK_BUILD_SRC_DIR)
 	rm -rf $(MY_OBJ_DIR)/$(SUPP_PACK_BUILD_SRC_DIR)
