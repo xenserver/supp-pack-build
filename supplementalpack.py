@@ -333,13 +333,6 @@ def setup(**attrs):
         for pkg in pkgs:
             shutil.copy(pkg.fname, attrs['outdir'])
 
-    digest = md5.new()
-    digest.update(_compat_xml(rtop))
-    digest.update(_compat_xml(ptop))
-    fh = open(os.path.join(attrs['outdir'], attrs['name']+".metadata.md5"), 'w')
-    fh.write(digest.hexdigest() + '\n')
-    fh.close()
-
     tmpdir = None
     if True in map(lambda x: x in attrs['output'], ('iso', 'tar')):
         tmpdir = tempfile.mkdtemp(prefix = 'pack-')
@@ -368,6 +361,13 @@ def setup(**attrs):
                     os.path.join(tmpdir, "install.sh"))
         shutil.copy(os.path.join(scriptdir, "suppack-install.py"),
                     os.path.join(tmpdir, "install"))
+
+	digest = md5.new()
+	digest.update(_compat_xml(rtop))
+	digest.update(_compat_xml(ptop))
+	fh = open(os.path.join(attrs['outdir'], attrs['name']+".metadata.md5"), 'w')
+	fh.write(digest.hexdigest() + '\n')
+	fh.close()
 
     if 'tar' in attrs['output']:
         tf = tarfile.TarFile.open(os.path.join(attrs['outdir'], attrs['name']+'.tar.gz'), 'w:gz')
