@@ -60,7 +60,8 @@ class Package:
                                         '-p', fname], stdout=subprocess.PIPE).communicate()[0]
             rpmgroup = subprocess.Popen(['rpm', '--nosignature', '-q', '--qf', '%{GROUP}',
                                          '-p', fname], stdout=subprocess.PIPE).communicate()[0]
-            if rpmgroup.endswith('/Kernel'):
+	    self.subtype = None
+            if rpmname != 'kernel' and rpmgroup.endswith('/Kernel'):
                 self.type = 'driver-rpm'
                 m = re.search('(.*)-modules-([^-]*)-(.*)', rpmname)
                 if m:
@@ -72,6 +73,8 @@ class Package:
             else:
                 self.type = 'rpm'
                 self.label = rpmname
+		if rpmname == 'kernel':
+			self.subtype = 'kernel'
         elif re.search('bzip2', filetype):
             self.type = 'tbz2'
             self.label = os.path.basename(fname)
@@ -91,7 +94,7 @@ class Package:
                 l = p.stdout.readline().strip()
                 if len(l) == 0:
                     break
-                if l.startswith('/lib/modules/') or l.startswith('/boot/vmlinu'):
+                if (l.startswith('/lib/modules/') or l.startswith('/boot/vmlinu')) and self.subtype != 'kernel':
                     raise SystemExit, "Error: unsupported file %s in %s" % (l, self.fname)
             p.wait()
         elif self.type == 'driver-rpm':
@@ -105,9 +108,9 @@ class Package:
                     break
                 if self.kernel == 'any':
                     # firmware / udev
-                    paths = ('/etc/udev/rules.d/', '/lib/firmware/', '/etc/',
-                             '/usr/share/doc/')
-                    if not True in map(lambda x: l.startswith(x), paths):
+                    paths = ('/etc/udev/rules.d', '/lib/firmware', '/etc',
+                             '/usr/share/doc')
+                    if not True in map(lambda x: l == x or l.startswith(x+'/'), paths):
                         raise SystemExit, "Error: unsupported file %s in %s" % (l, self.fname)
                 else:
                     # kernel modules
