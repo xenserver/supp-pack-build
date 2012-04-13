@@ -254,6 +254,9 @@ def setup(**attrs):
     if 'output' not in attrs:
         attrs['output'] = ['iso']
 
+    if 'reorder' not in attrs:
+	    attrs['reorder'] = True
+
     pkgs = []
     if 'packages' in attrs:
         pkgs = map(lambda x: Package(x), attrs['packages'])
@@ -272,7 +275,7 @@ def setup(**attrs):
 	if len(args) > 0:
 	    pkgs += map(lambda x: Package(x), args)
 
-    if 'reorder' in attrs and attrs['reorder']:
+    if attrs['reorder']:
         pkgs = _order_pkgs(pkgs)
     if 'permit_legacy' in attrs and attrs['permit_legacy']:
 	Package.permit_legacy = True
