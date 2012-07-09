@@ -257,6 +257,10 @@ def setup(**attrs):
     if 'reorder' not in attrs:
 	    attrs['reorder'] = True
 
+    include_script = True in map(lambda x: x in attrs['output'], ('iso', 'tar')):
+    if 'install_script' in attrs:
+	    include_script = True
+
     pkgs = []
     if 'packages' in attrs:
         pkgs = map(lambda x: Package(x), attrs['packages'])
@@ -337,7 +341,7 @@ def setup(**attrs):
             shutil.copy(pkg.fname, attrs['outdir'])
 
     tmpdir = None
-    if True in map(lambda x: x in attrs['output'], ('iso', 'tar')):
+    if include_script:
         tmpdir = tempfile.mkdtemp(prefix = 'pack-')
         bindir = os.path.dirname(sys.argv[0])
         if os.path.exists(os.path.join(bindir, "suppack-install.py")):
