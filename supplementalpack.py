@@ -257,7 +257,7 @@ def setup(**attrs):
     if 'reorder' not in attrs:
 	    attrs['reorder'] = True
 
-    include_script = True in map(lambda x: x in attrs['output'], ('iso', 'tar')):
+    include_script = True in map(lambda x: x in attrs['output'], ('iso', 'tar'))
     if 'install_script' in attrs:
 	    include_script = True
 
