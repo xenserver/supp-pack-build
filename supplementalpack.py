@@ -227,6 +227,21 @@ def _valid_ident(ident):
 	vc += '-_.'
 	return len(ident.strip(vc)) == 0
 
+def _copy_scripts(ddir, legacy = False):
+        bindir = os.path.dirname(sys.argv[0])
+        if os.path.exists(os.path.join(bindir, "suppack-install.py")):
+            scriptdir = bindir
+	elif os.path.exists("/usr/bin/suppack-install.py"):
+	    scriptdir = "/usr/bin"
+	else:
+            raise SystemExit, "Cannot locate suppack-install.py"
+
+	if legacy:
+	    shutil.copy(os.path.join(scriptdir, "suppack-install.sh"),
+			os.path.join(ddir, "install.sh"))
+        shutil.copy(os.path.join(scriptdir, "suppack-install.py"),
+                    os.path.join(ddir, "install"))
+
 setup_attrs = ('originator', 'name', 'product', 'version')
 opt_attrs = ('build', 'memory_requirement_mb', 'enforce_homogeneity')
 setup_args = ('vendor', 'description')
@@ -257,9 +272,8 @@ def setup(**attrs):
     if 'reorder' not in attrs:
 	    attrs['reorder'] = True
 
-    include_script = True in map(lambda x: x in attrs['output'], ('iso', 'tar'))
-    if 'install_script' in attrs:
-	    include_script = True
+    if 'install_script' not in attrs:
+	    include_script = False
 
     pkgs = []
     if 'packages' in attrs:
@@ -340,16 +354,13 @@ def setup(**attrs):
         for pkg in pkgs:
             shutil.copy(pkg.fname, attrs['outdir'])
 
+        # Copy install scripts
+	if attrs['install_script']:
+	    _copy_scripts(attrs['outdir'], False);
+
     tmpdir = None
-    if include_script:
+    if True in map(lambda x: x in attrs['output'], ('iso', 'tar')):
         tmpdir = tempfile.mkdtemp(prefix = 'pack-')
-        bindir = os.path.dirname(sys.argv[0])
-        if os.path.exists(os.path.join(bindir, "suppack-install.py")):
-            scriptdir = bindir
-	elif os.path.exists("/usr/bin/suppack-install.py"):
-	    scriptdir = "/usr/bin"
-	else:
-            raise SystemExit, "Cannot locate suppack-install.py"
 
         fh = open(os.path.join(tmpdir, "XS-REPOSITORY"), 'w')
 	fh.write(_compat_xml(rtop))
@@ -364,10 +375,7 @@ def setup(**attrs):
                        os.path.join(tmpdir, os.path.basename(pkg.fname)))
 
         # Copy install scripts
-        shutil.copy(os.path.join(scriptdir, "suppack-install.sh"),
-                    os.path.join(tmpdir, "install.sh"))
-        shutil.copy(os.path.join(scriptdir, "suppack-install.py"),
-                    os.path.join(tmpdir, "install"))
+	_copy_scripts(tmpdir, True)
 
 	digest = md5.new()
 	digest.update(_compat_xml(rtop))
