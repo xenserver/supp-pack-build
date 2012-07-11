@@ -273,7 +273,7 @@ def setup(**attrs):
 	    attrs['reorder'] = True
 
     if 'install_script' not in attrs:
-	    include_script = False
+	    attrs['install_script'] = False
 
     pkgs = []
     if 'packages' in attrs:
