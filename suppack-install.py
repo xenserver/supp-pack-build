@@ -14,6 +14,7 @@
 """XCP supplemental pack installer"""
 
 from xcp.accessor import *
+from xcp.environ import *
 from xcp.repository import *
 from xcp.version import *
 
@@ -188,5 +189,17 @@ try:
                              Repository.PKGDATA_FILENAME))
 except:
     raise SystemExit, "FATAL: Failed to update metadata"
+
+s = subprocess.Popen(['/opt/xensource/libexec/set-dom0-memory-target-from-packs'])
+_ = s.communicate()
+if s.returncode != 0:
+    raise SystemExit, "FATAL: packages failed to update memory target"
+
+i = readInventory()
+host_uuid = i['INSTALLATION_UUID']
+s = subprocess.Popen(['xe', 'host-refresh-pack-info', 'host-uuid='+host_uuid])
+_ = s.communicate()
+if s.returncode != 0:
+    raise SystemExit, "FATAL: packages failed to update software versions"
 
 print "Pack installation successful."
