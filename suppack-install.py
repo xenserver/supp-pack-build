@@ -195,8 +195,12 @@ _ = s.communicate()
 if s.returncode != 0:
     raise SystemExit, "FATAL: packages failed to update memory target"
 
-i = readInventory()
-host_uuid = i['INSTALLATION_UUID']
+try:
+    i = readInventory()
+    host_uuid = i['INSTALLATION_UUID']
+except:
+    raise SystemExit, "FATAL: cannot determine host UUID"
+
 s = subprocess.Popen(['xe', 'host-refresh-pack-info', 'host-uuid='+host_uuid])
 _ = s.communicate()
 if s.returncode != 0:
