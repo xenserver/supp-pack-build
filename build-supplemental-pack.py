@@ -55,14 +55,14 @@ if __name__ == '__main__':
     mandatory_opts = ("outdir", "originator", "vendor", "name", "description",
                       "version")
 
-    params = options.__dict__
+    params = dict(filter(lambda x: x[1] != None, options.__dict__.items()))
 
     if False in map(lambda x: x in params, mandatory_opts):
         parser.print_usage()
         sys.exit(1)
 
     if options.repo_data:
-        raise SystemExit, "Arbitary metadata no longer supported"
+        raise SystemExit, "Arbitrary metadata no longer supported"
 
     outputs = []
     if options.iso:
