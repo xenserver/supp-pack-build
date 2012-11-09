@@ -61,7 +61,9 @@ class Package:
             rpmgroup = subprocess.Popen(['rpm', '--nosignature', '-q', '--qf', '%{GROUP}',
                                          '-p', fname], stdout=subprocess.PIPE).communicate()[0]
 	    self.subtype = None
-            if rpmname != 'kernel' and rpmgroup.endswith('/Kernel'):
+            if rpmname in ('kernel', 'kernel-xen', 'kernel-kdump'):
+                self.subtype = 'kernel'
+            if self.subtype != 'kernel' and rpmgroup.endswith('/Kernel'):
                 self.type = 'driver-rpm'
                 m = re.search('(.*)-modules-([^-]*)-(.*)', rpmname)
                 if m:
@@ -73,8 +75,6 @@ class Package:
             else:
                 self.type = 'rpm'
                 self.label = rpmname
-		if rpmname == 'kernel':
-			self.subtype = 'kernel'
         elif re.search('bzip2', filetype):
             self.type = 'tbz2'
             self.label = os.path.basename(fname)
