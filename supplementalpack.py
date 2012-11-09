@@ -41,6 +41,10 @@ def md5sum_file(fname):
         fh.close()
         return digest.hexdigest()
 
+def rpm_fmt(fname, fmt):
+	return subprocess.Popen(['rpm', '--nosignature', '-q', '--qf', fmt,
+				 '-p', fname], stdout=subprocess.PIPE).communicate()[0]
+
 class Package:
     # allow creation of bzipped tar packages
     permit_legacy = False
@@ -58,10 +62,8 @@ class Package:
         filetype = subprocess.Popen(['file', '-k', '-b', fname],
                                     stdout=subprocess.PIPE).communicate()[0]
         if re.search('RPM', filetype):
-            rpmname = subprocess.Popen(['rpm', '--nosignature', '-q', '--qf', '%{NAME}',
-                                        '-p', fname], stdout=subprocess.PIPE).communicate()[0]
-            rpmgroup = subprocess.Popen(['rpm', '--nosignature', '-q', '--qf', '%{GROUP}',
-                                         '-p', fname], stdout=subprocess.PIPE).communicate()[0]
+            rpmname = rpm_fmt(fname, '%{NAME}')
+            rpmgroup = rpm_fmt(fname, '%{GROUP}')
 	    self.subtype = None
             if rpmname in ('kernel', 'kernel-xen', 'kernel-kdump'):
                 self.subtype = 'kernel'
@@ -180,10 +182,8 @@ def _order_pkgs(pkgs):
     rpm_pkgs = filter(lambda x: x.type.endswith('rpm'), pkgs)
 
     tlate = dict(zip(map(lambda x:
-                         subprocess.Popen(['rpm', '--nosignature', '-q', '--qf',
-                                           '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}',
-                                           '-p', x.fname], stdout=subprocess.PIPE).
-                         communicate()[0], rpm_pkgs), rpm_pkgs))
+                         rpm_fmt(x.fname, '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}'),
+                         rpm_pkgs), rpm_pkgs))
 
     ordered = []
     p = subprocess.Popen(['rpm', '--nosignature', '-ivv', '--test'] +
