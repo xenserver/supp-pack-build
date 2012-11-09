@@ -67,12 +67,14 @@ class Package:
 	    self.subtype = None
             if rpmname in ('kernel', 'kernel-xen', 'kernel-kdump'):
                 self.subtype = 'kernel'
+                self.options = '-i'
             if self.subtype != 'kernel' and rpmgroup.endswith('/Kernel'):
                 self.type = 'driver-rpm'
                 m = re.search('(.*)-modules-([^-]*)-(.*)', rpmname)
                 if m:
                     self.label = m.group(1)
                     self.kernel = m.group(3) + m.group(2)
+                    self.options = '-i'
                 else:
                     self.label = rpmname
                     self.kernel = 'any'
@@ -126,10 +128,14 @@ class Package:
 
     def toxml(self, doc):
         common_attrs = ('label', 'type', 'size', 'md5')
+        option_attrs = ('options',)
 
         pe = doc.createElement("package")
         for a in common_attrs:
             pe.setAttribute(a, self.__dict__[a])
+        for a in option_attrs:
+            if a in self.__dict__:
+                pe.setAttribute(a, self.__dict__[a])
         if self.type == 'driver-rpm':
             pe.setAttribute('kernel', self.kernel)
 	elif self.type == 'tbz2':
