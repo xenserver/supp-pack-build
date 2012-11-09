@@ -45,6 +45,8 @@ class Package:
     # allow creation of bzipped tar packages
     permit_legacy = False
 
+    driver_whitelist = ('md3000-rdac')
+
     def __init__(self, fname):
         self.fname = fname
         try:
@@ -115,7 +117,9 @@ class Package:
                 else:
                     # kernel modules
                     if not l.startswith('/lib/modules/'+self.kernel+'/extra/'):
-                        raise SystemExit, "Error: unsupported file %s in %s" % (l, self.fname)
+                        if l.startswith('/lib/modules/'+self.kernel+'/kernel/') and \
+                                        self.label not in self.driver_whitelist:
+                            raise SystemExit, "Error: unsupported file %s in %s" % (l, self.fname)
             p.wait()
 
     def toxml(self, doc):
