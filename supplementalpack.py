@@ -322,7 +322,7 @@ def setup(**attrs):
     for a in setup_attrs:
         rtop.setAttribute(a, attrs[a])
     for a in opt_attrs:
-        if a in attrs:
+        if a in attrs and attrs[a] != None:
             rtop.setAttribute(a.replace('_', '-'), attrs[a])
     te = rdoc.createElement("description")
     te.appendChild(rdoc.createTextNode(attrs['description']))
