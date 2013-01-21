@@ -135,7 +135,10 @@ for p in filter(lambda x: isinstance(x, RPMPackage), repo.packages):
     pkg_ver, _ = subprocess.Popen(['rpm', '--nosignature', '-q', '--qf', '%{VERSION}-%{RELEASE}',
                                     '-p', p.filename], stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE).communicate()
-    install = '-i' in p.options
+    if 'options' in p.__dict__:
+        install = '-i' in p.options
+    else:
+        install = (pkg_name in ['kernel-xen', 'kernel-kdump'])
     s = subprocess.Popen(['rpm', '--nosignature', '-q', '--qf', '%{VERSION}-%{RELEASE}',
                           pkg_name], stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
