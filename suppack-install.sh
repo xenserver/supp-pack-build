@@ -306,7 +306,7 @@ if [ $ret -eq 0 ]; then
   mkdir -p $installed_repos_dir/$identifier
   cp -fp XS-PACKAGES XS-REPOSITORY $installed_repos_dir/$identifier
 
-  /opt/xensource/libexec/set-dom0-memory-target-from-packs
+  [ -x /opt/xensource/libexec/set-dom0-memory-target-from-packs ] && /opt/xensource/libexec/set-dom0-memory-target-from-packs
 
   [ -r /etc/xensource-inventory ] && . /etc/xensource-inventory
   [ -n "$INSTALLATION_UUID" ] && xe host-refresh-pack-info host-uuid=$INSTALLATION_UUID
