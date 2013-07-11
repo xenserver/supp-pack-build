@@ -208,8 +208,6 @@ def _order_pkgs(pkgs):
                 a = line.split()
                 if len(a) == 8:
                     ordered.append(a[7][1:])
-                if len(a) == 7 and line.startswith('D:    '):
-                    ordered.append(a[6][1:])
                 else:
                     parse = False
 
