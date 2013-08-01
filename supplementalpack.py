@@ -206,10 +206,12 @@ def _order_pkgs(pkgs):
         elif parse:
             if not line.startswith('D: =='):
                 a = line.split()
-                if len(a) == 8:
-                    ordered.append(a[7][1:])
+                if (len(a) == 8 or len(a) == 7) and tlate.has_key(a[-1][1:]):
+                    ordered.append(a[-1][1:])
                 else:
                     parse = False
+    if len(ordered) != len(rpm_pkgs):
+        raise SystemExit, "Unable to detect package order"
 
     return legacy_pkgs + map(lambda x: tlate[x], ordered)
 
