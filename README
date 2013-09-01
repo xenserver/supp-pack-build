@@ -1,0 +1,14 @@
+What is this repository ?
+==========================
+
+This is the supp-pack-build repository for XenServer.
+
+To contribute bug fixes, email them to the XenServer development mailing
+
+list (xs-devel@lists.xenserver.org).
+
+
+What other documentation is available ?
+========================================
+
+To install supp-pack-build for XenServer please read INSTALL.
