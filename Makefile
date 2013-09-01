@@ -9,7 +9,7 @@ include $(B_BASE)/rpmbuild.mk
 .PHONY: $(MY_OBJ_DIR)/version.inc
 $(MY_OBJ_DIR)/version.inc:
 	$(version-makefile) > $@
-	$(call hg_cset_number,$(REPONAME)) >> $@
+	$(call git_cset_number,$(REPONAME)) >> $@
 	echo SUPP_PACK_BUILD_VERSION := \$$\(PLATFORM_VERSION\) >> $@
 	echo SUPP_PACK_BUILD_RELEASE := xs\$$\(CSET_NUMBER\) >> $@
 
