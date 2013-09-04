@@ -1,6 +1,6 @@
 There are prerequisites for building supp-pack-build for XenServer.
 All the following must be installed, either by visiting the
-project webpage or installing a pre-built package provided by 
+project webpage or installing a pre-built package provided by
 your OS distributor:
     * RPM build
     * Redhat rpm config (if debuginfo is required)
@@ -15,9 +15,8 @@ Follow these steps to build an RPM.
 1. Clone the supp-pack-build git repository to /some/path/supp-pack-build
 
 2. To obtain a tarballs of source run the following commands:
-
-   ?? 
-   
+     git archive --format=tar --prefix=supp-pack-build-1.8.50/ HEAD) |\
+          bzip2 -c > supp-pack-build-1.8.50.tar.bz2
 
 3. Replace with correct version numbers to create the spec file:
      sed -e s\,@SUPP_PACK_BUILD_VERSION@,1.8.50,g\
@@ -27,11 +26,11 @@ Follow these steps to build an RPM.
 
 4. Move supp-pack-build.tar.bz2 to /usr/src/redhat/SOURCES/
    Move supp-pack-build.spec    to /usr/src/redhat/SPECS/
-	      
+
 5. To build the RPMs run:
      cd /usr/src/redhat/SPECS/
      rpmbuild -ba supp-pack-build.spec --target noarch
-			  
+
 6. Install using
      rpm -ivh /usr/src/redhat/RPMS/noarch/supp-pack-build*.rpm
 
