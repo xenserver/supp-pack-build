@@ -4,7 +4,7 @@ Summary: Create XCP supplemental packs
 Name: supp-pack-build
 Version: @SUPP_PACK_BUILD_VERSION@
 Release: @SUPP_PACK_BUILD_RELEASE@
-Source: %{name}-%{version}.tar.gz
+Source: %{name}-%{version}.tar.bz2
 License: GPL
 Group: Applications/System
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot

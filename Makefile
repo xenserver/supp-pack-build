@@ -1,6 +1,7 @@
 USE_BRANDING := yes
 IMPORT_BRANDING := yes
 REPONAME := supp-pack-build
+REPO_LOC := $(call git_loc,supp-pack-build)
 DIRNAME := xcp
 include $(B_BASE)/common.mk
 include $(B_BASE)/rpmbuild.mk
@@ -17,7 +18,7 @@ SUPP_PACK_BUILD_SOURCES := $(wildcard *.py)
 
 SUPP_PACK_BUILD_SPEC := supp-pack-build.spec
 SUPP_PACK_BUILD_SRC_DIR := supp-pack-build-$(SUPP_PACK_BUILD_VERSION)
-SUPP_PACK_BUILD_SRC := $(RPM_SOURCESDIR)/supp-pack-build-$(SUPP_PACK_BUILD_VERSION).tar.gz
+SUPP_PACK_BUILD_SRC := $(RPM_SOURCESDIR)/supp-pack-build-$(SUPP_PACK_BUILD_VERSION).tar.bz2
 SUPP_PACK_BUILD_SRPM := supp-pack-build-$(SUPP_PACK_BUILD_VERSION)-$(SUPP_PACK_BUILD_RELEASE).src.rpm
 SUPP_PACK_BUILD_STAMP := $(MY_OBJ_DIR)/.rpmbuild.supp_pack_build.stamp
 
@@ -46,18 +47,9 @@ clean:
 	rm -f $(SUPP_PACK_BUILD_STAMP) $(SUPP_PACK_BUILD_SRC) $(RPM_SPECSDIR)/$(SUPP_PACK_BUILD_SPEC)
 
 .SECONDARY: $(SUPP_PACK_BUILD_SRC)
-$(SUPP_PACK_BUILD_SRC): $(SUPP_PACK_BUILD_SOURCES)
-	$(call mkdir_clean,$(MY_OBJ_DIR)/$(SUPP_PACK_BUILD_SRC_DIR))
-	mkdir -p $(MY_OBJ_DIR)/$(SUPP_PACK_BUILD_SRC_DIR)/$(DIRNAME)
-	mkdir -p $(MY_OBJ_DIR)/$(SUPP_PACK_BUILD_SRC_DIR)/scripts
-	cp -f setup.py $(MY_OBJ_DIR)/$(SUPP_PACK_BUILD_SRC_DIR)
-	cp -f supplementalpack.py $(MY_OBJ_DIR)/$(SUPP_PACK_BUILD_SRC_DIR)/$(DIRNAME)
-	cp -f build-supplemental-pack.py $(MY_OBJ_DIR)/$(SUPP_PACK_BUILD_SRC_DIR)/scripts
-	cp -f suppack-install.py $(MY_OBJ_DIR)/$(SUPP_PACK_BUILD_SRC_DIR)/scripts
-	cp -f suppack-install.sh $(MY_OBJ_DIR)/$(SUPP_PACK_BUILD_SRC_DIR)/scripts
-	echo -e "#!/bin/sh\nexec \$${0%.sh}.py \"\$$@\"" >$(MY_OBJ_DIR)/$(SUPP_PACK_BUILD_SRC_DIR)/scripts/build-supplemental-pack.sh
-	tar zcf $@ -C $(MY_OBJ_DIR) $(SUPP_PACK_BUILD_SRC_DIR)
-	rm -rf $(MY_OBJ_DIR)/$(SUPP_PACK_BUILD_SRC_DIR)
+$(SUPP_PACK_BUILD_SRC): $(SUPP_PACK_BUILD_SOURCES) $(RPM_SOURCESDIR)/.dirstamp $(REPO_LOC)
+	(cd $(REPO_LOC) && exec git archive --format=tar --prefix=supp-pack-build-$(SUPP_PACK_BUILD_VERSION)/ HEAD) | bzip2 -c > $@
+
 
 .SECONDARY: $(RPM_SPECSDIR)/%.spec
 $(RPM_SPECSDIR)/%.spec: *.spec.in
