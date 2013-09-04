@@ -1,6 +1,6 @@
 There are prerequisites for building supp-pack-build for XenServer.
 All the following must be installed, either by visiting the
-project webpage or installing a pre-built package provided by
+project webpage or installing a pre-built package provided by 
 your OS distributor:
     * RPM build
     * Redhat rpm config (if debuginfo is required)
