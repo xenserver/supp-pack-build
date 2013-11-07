@@ -65,7 +65,7 @@ class Package:
             rpmname = rpm_fmt(fname, '%{NAME}')
             rpmgroup = rpm_fmt(fname, '%{GROUP}')
 	    self.subtype = None
-            if rpmname in ('kernel', 'kernel-xen', 'kernel-kdump'):
+            if rpmname in ('kernel'):
                 self.subtype = 'kernel'
                 self.options = '-i'
             if self.subtype != 'kernel' and rpmgroup.endswith('/Kernel'):
@@ -104,8 +104,6 @@ class Package:
                     raise SystemExit, "Error: unsupported file %s in %s" % (l, self.fname)
             p.wait()
         elif self.type == 'driver-rpm':
-            if self.flavour() not in ('any', 'kdump', 'xen'):
-                raise SystemExit, "Error: unexpected kernel suffix (%s)" % self.kernel
             p = subprocess.Popen(['rpm', '--nosignature', '-qlp', self.fname],
                                  stdout=subprocess.PIPE)
             while True:
@@ -143,13 +141,6 @@ class Package:
         pe.appendChild(doc.createTextNode(os.path.basename(self.fname)))
 
         return pe
-
-    def flavour(self):
-        if self.type == 'driver-rpm':
-            m = re.search('([a-z]+)$', self.kernel)
-            return m.group(1)
-        else:
-            return ''
 
     def __repr__(self):
         return str(self.__dict__)
@@ -315,16 +306,6 @@ def setup(**attrs):
         raise SystemExit, "Error: no packages supplied"
     for pkg in pkgs:
         pkg.check()
-    xen_pkgs = set(map(lambda y: y.label+':'+y.kernel.replace('xen', ''),
-                       filter(lambda x: x.flavour() == 'xen', pkgs)))
-    kdump_pkgs = set(map(lambda y: y.label+':'+y.kernel.replace('kdump', ''),
-                         filter(lambda x: x.flavour() == 'kdump', pkgs)))
-    if len(xen_pkgs.difference(kdump_pkgs)) > 0:
-        raise SystemExit, "Error: no kdump kernel module found for " + \
-              ','.join(xen_pkgs.difference(kdump_pkgs))
-    if len(kdump_pkgs.difference(xen_pkgs)) > 0:
-        raise SystemExit, "Error: no xen kernel module found for " + \
-              ','.join(kdump_pkgs.difference(xen_pkgs))
 
     # Create metadata
     dom = xml.dom.minidom.getDOMImplementation()
