@@ -74,7 +74,6 @@ class Package:
                 if m:
                     self.label = m.group(1)
                     self.kernel = m.group(3) + m.group(2)
-                    self.options = '-i'
                 else:
                     self.label = rpmname
                     self.kernel = 'any'
