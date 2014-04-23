@@ -70,10 +70,10 @@ class Package:
                 self.options = '-i'
             if self.subtype != 'kernel' and rpmgroup.endswith('/Kernel'):
                 self.type = 'driver-rpm'
-                m = re.search('(.*)-modules-([^-]*)-(.*)', rpmname)
+                m = re.search('(.*)-modules-(.*)', rpmname)
                 if m:
                     self.label = m.group(1)
-                    self.kernel = m.group(3) + m.group(2)
+                    self.kernel = m.group(2)
                 else:
                     self.label = rpmname
                     self.kernel = 'any'
@@ -182,7 +182,7 @@ def _order_pkgs(pkgs):
                          rpm_pkgs), rpm_pkgs))
 
     ordered = []
-    p = subprocess.Popen(['rpm', '--nosignature', '-ivv', '--test'] +
+    p = subprocess.Popen(['rpm', '--nosignature', '-ivv', '--test', '--nodeps'] +
                          map(lambda x: x.fname, rpm_pkgs),
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     _, out = p.communicate()
