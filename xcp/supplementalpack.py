@@ -193,6 +193,8 @@ def _order_pkgs(pkgs):
             parse = False
         if 'tsorting packages' in line:
             parse = True
+        elif 'continuing tsort' in line:
+            parse = True
         elif parse:
             if not line.startswith('D: =='):
                 a = line.split()
