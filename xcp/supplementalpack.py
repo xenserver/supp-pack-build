@@ -70,7 +70,7 @@ class Package:
                 self.options = '-i'
             if self.subtype != 'kernel' and rpmgroup.endswith('/Kernel'):
                 self.type = 'driver-rpm'
-                m = re.search('(.*)-modules-(.*)', rpmname)
+                m = re.search('(.*)-(.*)-modules', rpmname)
                 if m:
                     self.label = m.group(1)
                     self.kernel = m.group(2)
@@ -97,6 +97,8 @@ class Package:
                                  stdout=subprocess.PIPE)
             while True:
                 l = p.stdout.readline().strip()
+                if l == '(contains no files)':
+                    continue
                 if len(l) == 0:
                     break
                 if (l.startswith('/lib/modules/') or l.startswith('/boot/vmlinu')) and self.subtype != 'kernel':
@@ -107,6 +109,8 @@ class Package:
                                  stdout=subprocess.PIPE)
             while True:
                 l = p.stdout.readline().strip()
+                if l == '(contains no files)':
+                    continue
                 if len(l) == 0:
                     break
                 if self.kernel == 'any':
@@ -117,7 +121,8 @@ class Package:
                         raise SystemExit, "Error: unsupported file %s in %s" % (l, self.fname)
                 else:
                     # kernel modules
-                    if not l.startswith('/lib/modules/'+self.kernel+'/extra/'):
+                    if not l.startswith('/lib/modules/'+self.kernel+'/extra/') and \
+				not l.startswith('/lib/modules/'+self.kernel+'/updates/'):
                         if l.startswith('/lib/modules/'+self.kernel+'/kernel/') and \
                                         self.label not in self.driver_whitelist:
                             raise SystemExit, "Error: unsupported file %s in %s" % (l, self.fname)
