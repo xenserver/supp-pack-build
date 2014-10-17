@@ -203,7 +203,7 @@ def _order_pkgs(pkgs):
         elif parse:
             if not line.startswith('D: =='):
                 a = line.split()
-                if (len(a) == 8 or len(a) == 7) and tlate.has_key(a[-1][1:]):
+                if len(a) in (6, 7, 8) and tlate.has_key(a[-1][1:]):
                     ordered.append(a[-1][1:])
                 else:
                     parse = False
