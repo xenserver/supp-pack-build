@@ -18,6 +18,7 @@ from xcp.environ import *
 from xcp.repository import *
 from xcp.version import *
 
+from optparse import OptionParser
 import os.path
 import shutil
 import subprocess
@@ -42,6 +43,10 @@ def prompt_continue(msg, ret):
 
 def prompt_accept(msg, ret):
     _prompt("Accept? (Y/N) ", msg, ret)
+
+def fatal_error(msg, ret):
+    print >>sys.stderr, msg
+    sys.exit(ret)
         
 def md5sum_file(fname):
         digest = md5.new()
@@ -53,6 +58,13 @@ def md5sum_file(fname):
             digest.update(blk)
         fh.close()
         return digest.hexdigest()
+
+
+parser = OptionParser()
+parser.add_option('-b', '--batch', action="store_true", dest="batch",
+                  default=False,
+                  help="Set non-interactive mode")
+(options, _) = parser.parse_args()
 
 try:
     a = FileAccessor('file://./', True)
@@ -84,10 +96,12 @@ if 'PRODUCT_BRAND' in inventory:
         match = True
 
     if not match:
+        if options.batch:
+            fatal_error("Error: Repository is not compatible with installed product (%s expected)" % repo.product, 2)
         prompt_continue("Error: Repository is not compatible with installed product (%s expected)" % repo.product, 2)
 
 # check if installed already
-if os.path.exists(os.path.join(INSTALLED_REPOS_DIR, repo.identifier)):
+if not options.batch and os.path.exists(os.path.join(INSTALLED_REPOS_DIR, repo.identifier)):
     prompt_continue("Warning: '%s' is already installed" % repo.description, 3)
 
 # check dependencies
@@ -105,10 +119,12 @@ for r in repo.requires:
     
     d = Repository(a, ri)
     if not eval("d.product_version.__%s__(want_ver)" % r['test']):
-        print "Error: unsatisfied dependency %s %s %s" % (ri, r['test'], ver_str)
+        print >>sys.stderr, "Error: unsatisfied dependency %s %s %s" % (ri, r['test'], ver_str)
         errors = True
 
 if errors:
+    if options.batch:
+        fatal_error("Unsatisfied dependencies", 2)
     prompt_continue(None, 2)
 
 # check packages
@@ -116,10 +132,10 @@ fatal = False
 for p in repo.packages:
     if os.path.exists(p.filename):
         if md5sum_file(p.filename) != p.md5sum:
-            print "FATAL: MD5 mismatch on %s (expected %s)" % (p.filename, p.md5sum)
+            print >>sys.stderr, "FATAL: MD5 mismatch on %s (expected %s)" % (p.filename, p.md5sum)
             fatal = True
     else:
-        print "FATAL: %s missing" % p.filename
+        print >>sys.stderr, "FATAL: %s missing" % p.filename
         fatal = True
 
 if fatal:
