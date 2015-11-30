@@ -252,7 +252,7 @@ def _copy_scripts(ddir, legacy = False):
                     os.path.join(ddir, "install"))
 
 setup_attrs = ('originator', 'name', 'product', 'version')
-opt_attrs = ('build', 'memory_requirement_mb', 'enforce_homogeneity')
+opt_attrs = ('build', 'memory_requirement_mb', 'enforce_homogeneity', 'hidden')
 setup_args = ('vendor', 'description')
 
 # main pack builder
@@ -283,6 +283,12 @@ def setup(**attrs):
 
     if 'install_script' not in attrs:
 	    attrs['install_script'] = False
+
+    if 'hidden' in attrs:
+        if attrs['hidden']:
+            attrs['hidden'] = 'true'
+        else:
+            del attrs['hidden']
 
     pkgs = []
     if 'packages' in attrs:
