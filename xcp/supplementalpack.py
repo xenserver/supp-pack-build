@@ -355,7 +355,7 @@ def setup(**attrs):
 
         # Copy install scripts
 	if attrs['install_script']:
-	    _copy_scripts(attrs['outdir'], False);
+	    _copy_scripts(attrs['outdir']);
 
     tmpdir = None
     if True in map(lambda x: x in attrs['output'], ('iso', 'tar')):
@@ -374,7 +374,7 @@ def setup(**attrs):
                        os.path.join(tmpdir, os.path.basename(pkg.fname)))
 
         # Copy install scripts
-	_copy_scripts(tmpdir, True)
+	_copy_scripts(tmpdir)
 
 	digest = md5.new()
 	digest.update(_compat_xml(rtop))
